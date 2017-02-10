@@ -38,6 +38,7 @@ import java.util.Map;
 
 public class Simulator {
 	private static final Map<Integer, Ball> balls = new HashMap<>();
+	private static int layers, length;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -55,11 +56,14 @@ public class Simulator {
 				layers.add(layer);
 			}
 		}
+		Simulator.layers = layers.size();
 		int length = layers.get(0).length();
 		for (int i = 1; i < layers.size(); i++) {
 			int l = layers.get(i).length();
 			length = length > l ? length : l;
 		}
+		Simulator.length = length;
+		int[][] hidden_layers = new int[layers.size()][];
 		for (int i = 0; i < layers.size(); i++) {
 			StringBuffer string = new StringBuffer(length);
 			string.append(layers.get(i));
@@ -83,48 +87,103 @@ public class Simulator {
 					}
 				}
 			}
+			hidden_layers[i] = hidden_layer;
+		}
+
+		while (keepRunning()) {
 			List<Integer> keys = new ArrayList<>(balls.keySet());
 			Collections.sort(keys);
 			for (Integer id : keys) {
 				Ball ball = balls.get(id);
-				while (ball.layer == i) {
-					char space = layers.get(i).charAt(ball.column);
+				if (ball == null) {
+				} else if (!valid(ball)) {
+					balls.remove(ball.name);
+				} else {
+					char space = layers.get(ball.layer).charAt(ball.column);
 					if (space == '_') {
-						hidden_layer[ball.column]--;
-						if (ball.direction == 0) {
+						hidden_layers[ball.layer][ball.column]--;
+						if (ball.direction == 0 && ball.levitating != 1) {
 							balls.remove(ball.name);
 							break;
 						} else {
 							ball.column += ball.direction;
+							if (ball.levitating == 1) {
+								ball.layer--;
+							}
 						}
 					} else if (space >= 'A' && space <= 'Z') {
-						hidden_layer[ball.column]++;
+						hidden_layers[ball.layer][ball.column]++;
 						ball.direction = 0;
-						ball.layer++;
+						ball.layer -= ball.levitating;
 					} else if (space == '\\' || space == '/') {
-						if (ball.direction == 0) {
+						if (ball.levitating == 1 && ball.direction == 0) {
+							ball.direction = space == '/' ? 1 : -1;
+							ball.column += ball.direction;
+						} else if (ball.direction == 0) {
 							ball.direction = space == '/' ? -1 : 1;
 							ball.column += ball.direction;
 						} else {
 							ball.direction = 0;
+							ball.levitating = -1;
 							ball.layer++;
 						}
+					} else if (space == '^') {
+						ball.direction = 0;
+						ball.levitating = 1;
+						ball.layer--;
 					} else {
-						ball.layer++;
+						ball.layer -= ball.levitating;
 						ball.direction = 0;
 					}
 				}
 			}
 
+			for (int i = 0; i < hidden_layers.length; i++) {
+				if (emptyLayer(i)) {
+					int[] hidden_layer = hidden_layers[i];
+					for (int j = 0; j < hidden_layer.length; j++) {
+						if (hidden_layer[j] < 0 && -hidden_layer[j] % 2 == 0) {
+							createBall(i + 1, j);
+							hidden_layer[j] = 0;
+						}
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < hidden_layers.length; i++) {
+			int[] hidden_layer = hidden_layers[i];
 			for (int j = 0; j < hidden_layer.length; j++) {
 				char c;
-				if (hidden_layer[j] < 0 && -hidden_layer[j] % 2 == 0) {
-					createBall(i + 1, j);
-				} else if ((c = layer.charAt(j)) >= 'A' && c <= 'Z') {
+				if ((c = layers.get(i).charAt(j)) >= 'A' && c <= 'Z') {
 					System.out.println(c + ":" + hidden_layer[j]);
 				}
 			}
 		}
+	}
+
+	public static boolean emptyLayer(int layer) {
+		for (Ball ball : balls.values()) {
+			if (ball.layer == layer) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean valid(Ball ball) {
+		return ball.layer >= 0 && ball.layer < layers && ball.column >= 0
+				&& ball.column < length;
+	}
+
+	public static boolean keepRunning() {
+		for (Ball ball : balls.values()) {
+			if (ball.layer >= 0 && ball.layer < layers && ball.column >= 0
+					&& ball.column < length) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static void createBall(int layer, int column) {
@@ -136,13 +195,14 @@ public class Simulator {
 	}
 
 	public static final class Ball {
-		public int name, layer, column, direction;
+		public int name, layer, column, direction, levitating;
 
 		public Ball(int name, int layer, int column) {
 			this.name = name;
 			this.layer = layer;
 			this.column = column;
 			this.direction = 0;
+			this.levitating = -1;
 		}
 
 		public String toString() {
