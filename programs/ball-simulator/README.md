@@ -3,7 +3,7 @@ MIT License applies to this software.
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of '#' on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>ID,.P`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>ID,.P`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
