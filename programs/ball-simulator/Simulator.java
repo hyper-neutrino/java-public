@@ -43,6 +43,12 @@ public class Simulator {
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
+		boolean output_states = true;
+		for (String arg : args) {
+			if (arg.equals("--ignore-states")) {
+				output_states = false;
+			}
+		}
 		List<String> layers = new ArrayList<>();
 		String layer;
 		while (true) {
@@ -64,6 +70,8 @@ public class Simulator {
 		}
 		Simulator.length = length;
 		int[][] hidden_layers = new int[layers.size()][];
+		int[][] metadata = new int[layers.size()][length];
+		int[][] mem = new int[layers.size()][length];
 		for (int i = 0; i < layers.size(); i++) {
 			StringBuffer string = new StringBuffer(length);
 			string.append(layers.get(i));
@@ -82,8 +90,10 @@ public class Simulator {
 				} else if (!balls.containsKey((int) character)
 						&& character >= 'a' && character <= 'z') {
 					System.out.print(character + ":");
-					if (reader.readLine().trim().equals("1")) {
-						balls.put((int) character, new Ball(character, i, j));
+					int value;
+					if ((value = Integer.parseInt(reader.readLine().trim())) != 0) {
+						balls.put((int) character, new Ball(character, i, j,
+								value));
 					}
 				}
 			}
@@ -100,40 +110,59 @@ public class Simulator {
 					balls.remove(ball.name);
 				} else {
 					char space = layers.get(ball.layer).charAt(ball.column);
-					if (space == '_') {
-						hidden_layers[ball.layer][ball.column]--;
-						if (ball.direction == 0 && ball.levitating != 1) {
-							balls.remove(ball.name);
-							break;
-						} else {
-							ball.column += ball.direction;
-							if (ball.levitating == 1) {
-								ball.layer--;
+					int data = metadata[ball.layer][ball.column];
+					boolean run = ball.value == 0 || ball.value != data;
+					if (run) {
+						if (space == '_') {
+							hidden_layers[ball.layer][ball.column]--;
+							if (ball.direction == 0 && ball.levitating != 1) {
+								balls.remove(ball.name);
+								break;
+							} else {
+								ball.column += ball.direction;
+								if (ball.levitating == 1) {
+									ball.layer--;
+								}
 							}
-						}
-					} else if (space >= 'A' && space <= 'Z') {
-						hidden_layers[ball.layer][ball.column]++;
-						ball.direction = 0;
-						ball.layer -= ball.levitating;
-					} else if (space == '\\' || space == '/') {
-						if (ball.levitating == 1 && ball.direction == 0) {
-							ball.direction = space == '/' ? 1 : -1;
-							ball.column += ball.direction;
-						} else if (ball.direction == 0) {
-							ball.direction = space == '/' ? -1 : 1;
-							ball.column += ball.direction;
-						} else {
+						} else if (space == '\\' || space == '/') {
+							if (ball.levitating == 1 && ball.direction == 0) {
+								ball.direction = space == '/' ? 1 : -1;
+								ball.column += ball.direction;
+							} else if (ball.direction == 0) {
+								ball.direction = space == '/' ? -1 : 1;
+								ball.column += ball.direction;
+							} else {
+								ball.direction = 0;
+								ball.levitating = -1;
+								ball.layer++;
+							}
+						} else if (space == '^') {
 							ball.direction = 0;
-							ball.levitating = -1;
-							ball.layer++;
+							ball.levitating = 1;
+							ball.layer--;
+						} else {
+							if (space >= 'A' && space <= 'Z') {
+								hidden_layers[ball.layer][ball.column]++;
+							} else if (space == 'I') {
+								ball.value++;
+							} else if (space == 'D') {
+								ball.value--;
+							} else if (space == ',') {
+								System.out.print(ball.name + ":");
+								ball.value = Integer.parseInt(reader.readLine()
+										.trim());
+							} else if (space == '.') {
+								System.out.print((char) ball.value);
+							} else if (space == 'P') {
+								System.out.println(ball.value);
+							} else if (space == '<' || space == '>') {
+								metadata[ball.layer][ball.column
+										+ (space == '<' ? -1 : 1)] = ball.value;
+								balls.remove(ball.name);
+							}
+							ball.layer -= ball.levitating;
+							ball.direction = 0;
 						}
-					} else if (space == '^') {
-						ball.direction = 0;
-						ball.levitating = 1;
-						ball.layer--;
-					} else {
-						ball.layer -= ball.levitating;
-						ball.direction = 0;
 					}
 				}
 			}
@@ -151,12 +180,14 @@ public class Simulator {
 			}
 		}
 
-		for (int i = 0; i < hidden_layers.length; i++) {
-			int[] hidden_layer = hidden_layers[i];
-			for (int j = 0; j < hidden_layer.length; j++) {
-				char c;
-				if ((c = layers.get(i).charAt(j)) >= 'A' && c <= 'Z') {
-					System.out.println(c + ":" + hidden_layer[j]);
+		if (output_states) {
+			for (int i = 0; i < hidden_layers.length; i++) {
+				int[] hidden_layer = hidden_layers[i];
+				for (int j = 0; j < hidden_layer.length; j++) {
+					char c;
+					if ((c = layers.get(i).charAt(j)) >= 'A' && c <= 'Z') {
+						System.out.println(c + ":" + hidden_layer[j]);
+					}
 				}
 			}
 		}
@@ -191,22 +222,24 @@ public class Simulator {
 		while ((k < 'a' || k > 'z') && balls.containsKey(k)) {
 			k++;
 		}
-		balls.put(k, new Ball(k, layer, column));
+		balls.put(k, new Ball(k, layer, column, 1));
 	}
 
 	public static final class Ball {
-		public int name, layer, column, direction, levitating;
+		public int name, layer, column, direction, levitating, value;
 
-		public Ball(int name, int layer, int column) {
+		public Ball(int name, int layer, int column, int value) {
 			this.name = name;
 			this.layer = layer;
 			this.column = column;
 			this.direction = 0;
 			this.levitating = -1;
+			this.value = value;
 		}
 
 		public String toString() {
-			return "Ball " + name + ": [" + layer + ", " + column + "]";
+			return "Ball " + name + ": [" + layer + ", " + column + "]: "
+					+ value;
 		}
 	}
 }
