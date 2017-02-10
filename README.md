@@ -3,8 +3,8 @@ Public Java Programs -- Everything is free to use with the MIT License
 
 # Contents
 
-<h1>Billiard Ball Machines</h1>
-<h2>Inspired by
+<h3>Billiard Ball Machines</h1>
+<h5>Inspired by
 	<a href="http://codegolf.stackexchange.com/users/2867/phinotpi">PhiNotPi</a>'s 
 	<a href="http://codegolf.stackexchange.com/">code-golf</a> 
 	challenge about simulating
