@@ -37,6 +37,6 @@ All other characters will allow the ball to pass through them; if it is falling,
 
 # Interpreter Flags
 
-`--ignore-states -i` supresses output from capital-letters.
-`--debug -d` prints all of the balls in the system and requires the user to press <Enter> each time before all balls have been iterated.
+`--ignore-states -i` supresses output from capital-letters.  
+`--debug -d` prints all of the balls in the system and requires the user to press <Enter> each time before all balls have been iterated.  
 `--wait -w <ms>` waits `ms` milliseconds before all balls are iterated once.
