@@ -3,7 +3,7 @@
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>↑↓↧.↥`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>↑↓↧.↥+-*`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
@@ -28,6 +28,8 @@ The characters `<` and `>` "inject" the ball's value into whatever is to its lef
 `↥` outputs the ball's value as an integer.
 
 Levitation is started only by the character `^` and is stopped by a ramp.
+
+`+`, `-`, and `*` will consume a ball and store its value on the first ball, and then on the second ball, will consume it and apply that operator to both of them. A new ball with this value is released right under it. It will then reset its memory and reset its state.
 
 Balls cannot collide. Execution stops once all balls have left the specified grid.
 
