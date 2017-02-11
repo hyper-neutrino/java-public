@@ -1,4 +1,4 @@
-MIT License applies to this software.
+# MIT License applies to this software.
 
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
@@ -34,3 +34,9 @@ Balls cannot collide. Execution stops once all balls have left the specified gri
 All strings that are shorter than the longest string will be padded with spaces on the right so that it is a rectangular grid.
 
 All other characters will allow the ball to pass through them; if it is falling, it keeps falling. If it is rolling, it stops rolling and falls straight down (there is not horizontal momentum in this language). If it is levitating, it keeps levitating straight up.
+
+# Interpreter Flags
+
+`--ignore-states -i` supresses output from capital-letters.
+`--debug -d` prints all of the balls in the system and requires the user to press <Enter> each time before all balls have been iterated.
+`--wait -w <ms>` waits `ms` milliseconds before all balls are iterated once.

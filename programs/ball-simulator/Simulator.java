@@ -43,13 +43,15 @@ public class Simulator {
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
-		boolean output_states = true;
+		boolean output_states = true, debug = false;
 		long delay = 0;
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
-			if (arg.equals("--ignore-states")) {
+			if (arg.equals("--ignore-states") || arg.equals("-i")) {
 				output_states = false;
-			} else if (arg.equals("--delay")) {
+			} else if (arg.equals("--debug") || arg.equals("-d")) {
+				debug = true;
+			} else if (arg.equals("--wait") || arg.equals("-w")) {
 				delay = Long.parseLong(args[++i]);
 			}
 		}
@@ -113,8 +115,10 @@ public class Simulator {
 					time--;
 				}
 			}
-			System.out.println(balls);
-			reader.readLine();
+			if (debug) {
+				System.out.println(balls);
+				reader.readLine();
+			}
 			List<Integer> keys = new ArrayList<>(balls.keySet());
 			Collections.sort(keys);
 			for (Integer id : keys) {
