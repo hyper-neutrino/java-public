@@ -44,9 +44,13 @@ public class Simulator {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
 		boolean output_states = true;
-		for (String arg : args) {
+		long delay = 0;
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
 			if (arg.equals("--ignore-states")) {
 				output_states = false;
+			} else if (arg.equals("--delay")) {
+				delay = Long.parseLong(args[++i]);
 			}
 		}
 		List<String> layers = new ArrayList<>();
@@ -101,6 +105,16 @@ public class Simulator {
 		}
 
 		while (keepRunning()) {
+			for (long time = 0; time < delay; time++) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					time--;
+				}
+			}
+			System.out.println(balls);
+			reader.readLine();
 			List<Integer> keys = new ArrayList<>(balls.keySet());
 			Collections.sort(keys);
 			for (Integer id : keys) {
@@ -111,8 +125,7 @@ public class Simulator {
 				} else {
 					char space = layers.get(ball.layer).charAt(ball.column);
 					int data = metadata[ball.layer][ball.column];
-					boolean run = ball.value == 0 || ball.value != data;
-					if (run) {
+					if (ball.value == 0 || ball.value != data) {
 						if (space == '_') {
 							hidden_layers[ball.layer][ball.column]--;
 							if (ball.direction == 0 && ball.levitating != 1) {
@@ -143,17 +156,17 @@ public class Simulator {
 						} else {
 							if (space >= 'A' && space <= 'Z') {
 								hidden_layers[ball.layer][ball.column]++;
-							} else if (space == 'I') {
+							} else if (space == '↑') {
 								ball.value++;
-							} else if (space == 'D') {
+							} else if (space == '↓') {
 								ball.value--;
-							} else if (space == ',') {
+							} else if (space == '↧') {
 								System.out.print(ball.name + ":");
 								ball.value = Integer.parseInt(reader.readLine()
 										.trim());
 							} else if (space == '.') {
 								System.out.print((char) ball.value);
-							} else if (space == 'P') {
+							} else if (space == '↥') {
 								System.out.println(ball.value);
 							} else if (space == '<' || space == '>') {
 								metadata[ball.layer][ball.column
@@ -163,6 +176,9 @@ public class Simulator {
 							ball.layer -= ball.levitating;
 							ball.direction = 0;
 						}
+					} else {
+						ball.layer -= ball.levitating;
+						ball.direction = 0;
 					}
 				}
 			}

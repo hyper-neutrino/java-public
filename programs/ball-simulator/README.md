@@ -3,7 +3,7 @@ MIT License applies to this software.
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>ID,.P`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>↑↓↧.↥`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
@@ -19,13 +19,13 @@ The character `^` sets a ball's direction to `0` and makes it begin levitating.
 
 The characters `<` and `>` "inject" the ball's value into whatever is to its left/right. Essentially, if a ball with value `X` reaches a control operator with metadata `X`, the operator will do nothing. This allows for condition statements, albeit rather confusing. The ball whose value was used is then destroyed.
 
-`I` and `D` increment/decrement a ball's value.
+`↑` and `↓` increment/decrement a ball's value.
 
-`,` prompts for the user's input and sets it as the ball's value; this is equivalent to destroying the ball and creating a new ball at that space with the same name.
+`↧` prompts for the user's input and sets it as the ball's value; this is equivalent to destroying the ball and creating a new ball at that space with the same name.
 
 `.` outputs the ball's value as `(char) value`.
 
-`P` outputs the ball's value as an integer.
+`↥` outputs the ball's value as an integer.
 
 Levitation is started only by the character `^` and is stopped by a ramp.
 
