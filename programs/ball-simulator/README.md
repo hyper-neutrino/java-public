@@ -3,11 +3,13 @@
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\_/^←→↑↓↧⇲.↥+-*<>≤≥⋀$`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\_/^←→↑↓↧⇓⇩.↥+-*<>≤≥⋀$`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
-If the character is `⇲`, an input will be taken and stored into a new ball.
+If the character is `⇓`, an input will be taken, parsed to an integer, and stored into a new ball.
+
+If the character is `⇩`, an input will be taken, and each character in the input (excluding the newline) will be stored into a new ball.
 
 An uppercase letter is an output. Every time a ball passes through its space, it will increment its value (by 1). At the end of the execution, all outputs will be printed in order of row first, then column.
 

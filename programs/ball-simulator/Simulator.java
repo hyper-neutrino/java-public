@@ -104,9 +104,14 @@ public class Simulator {
 				char character = layer.charAt(j);
 				if (character >= '0' && character <= '9') {
 					createBall(i, j, character - '0');
-				} else if (character == '⇲') {
+				} else if (character == '⇓') {
 					int value;
 					if ((value = Integer.parseInt(reader.readLine().trim())) != 0) {
+						createBall(i, j, value);
+					}
+
+				} else if (character == '⇩') {
+					for (char value : reader.readLine().toCharArray()) {
 						createBall(i, j, value);
 					}
 				}
