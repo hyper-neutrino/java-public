@@ -31,6 +31,8 @@ Levitation is started only by the character `^` and is stopped by a ramp.
 
 `+`, `-`, and `*` will consume a ball and store its value on the first ball, and then on the second ball, will consume it and apply that operator to both of them. A new ball with this value is released right under it. It will then reset its memory and reset its state.
 
+`<`, `>`, `≤`, `≥`, and `=` will compare the values of two balls (first in first), and then will release a ball if the comparison is true.
+
 Balls cannot collide. Execution stops once all balls have left the specified grid.
 
 All strings that are shorter than the longest string will be padded with spaces on the right so that it is a rectangular grid.

@@ -61,7 +61,7 @@ public class Simulator {
 			if (layer.contains("#")) {
 				layer = layer.substring(0, layer.indexOf("#"));
 			}
-			if (layer.trim().isEmpty()) {
+			if (layer.isEmpty()) {
 				break;
 			} else {
 				layers.add(layer);
@@ -93,11 +93,10 @@ public class Simulator {
 				char character = layer.charAt(j);
 				if (character >= '0' && character <= '9') {
 					createBall(i, j, character - '0');
-				} else if (!balls.containsKey((int) character) && character >= 'a' && character <= 'z') {
-					System.out.print(character + ":");
+				} else if (character == '⇲') {
 					int value;
 					if ((value = Integer.parseInt(reader.readLine().trim())) != 0) {
-						balls.put((int) character, new Ball(character, i, j, value));
+						createBall(i, j, value);
 					}
 				}
 			}
@@ -155,6 +154,10 @@ public class Simulator {
 							ball.setDirection(0);
 							ball.setLevitating(1);
 							ball.setLayer(ball.getLayer() - 1);
+						} else if (space == '⋀') {
+							balls.remove(ball.name);
+							createBall(ball.getLayer(), ball.getColumn() - 1, ball.getValue());
+							createBall(ball.getLayer(), ball.getColumn() + 1, ball.getValue());
 						} else {
 							if (space >= 'A' && space <= 'Z') {
 								hidden_layers[ball.getLayer()][ball.getColumn()]++;
@@ -163,19 +166,31 @@ public class Simulator {
 							} else if (space == '↓') {
 								ball.setValue(ball.getValue() - 1);
 							} else if (space == '↧') {
-								System.out.print(ball.getName() + ":");
 								ball.setValue(Integer.parseInt(reader.readLine().trim()));
 							} else if (space == '.') {
 								System.out.print((char) ball.getValue());
 							} else if (space == '↥') {
 								System.out.println(ball.getValue());
-							} else if (space == '<' || space == '>') {
-								metadata[ball.getLayer()][ball.getColumn() + (space == '<' ? -1 : 1)] = ball.getValue();
+							} else if (space == '←' || space == '→') {
+								metadata[ball.getLayer()][ball.getColumn() + (space == '←' ? -1 : 1)] = ball.getValue();
 								balls.remove(ball.getName());
-							} else if (space == '+' || space == '-' || space == '*') {
+							} else if (Operator.operators.containsKey(space)) {
 								if (mf[ball.getLayer()][ball.getColumn()]) {
 									createBall(ball.getLayer() + 1, ball.getColumn(), Operator.operators.get(space)
 											.operate(ball.getValue(), mem[ball.getLayer()][ball.getColumn()]));
+									balls.remove(ball.getName());
+								} else {
+									mem[ball.getLayer()][ball.getColumn()] = ball.getValue();
+									balls.remove(ball.getName());
+								}
+
+								mf[ball.getLayer()][ball.getColumn()] ^= true;
+							} else if (Operator.comparators.containsKey(space)) {
+								if (mf[ball.getLayer()][ball.getColumn()]) {
+									if (Operator.comparators.get(space).operate(ball.getValue(),
+											mem[ball.getLayer()][ball.getColumn()])) {
+										createBall(ball.getLayer() + 1, ball.getColumn(), 1);
+									}
 									balls.remove(ball.getName());
 								} else {
 									mem[ball.getLayer()][ball.getColumn()] = ball.getValue();
@@ -245,7 +260,7 @@ public class Simulator {
 
 	public static void createBall(int layer, int column, int value) {
 		int k = 0;
-		while ((k < 'a' || k > 'z') && balls.containsKey(k)) {
+		while (balls.containsKey(k)) {
 			k++;
 		}
 		balls.put(k, new Ball(k, layer, column, value));
@@ -321,15 +336,26 @@ public class Simulator {
 		}
 	}
 
-	public interface Operator {
-		public int operate(int x, int y);
+	public interface Operator<T, U, R> {
+		public R operate(T x, U y);
 
 		@SuppressWarnings("serial")
-		Map<Character, Operator> operators = new HashMap<Character, Operator>() {
+		Map<Character, Operator<Integer, Integer, Integer>> operators = new HashMap<Character, Operator<Integer, Integer, Integer>>() {
 			{
 				put('+', (x, y) -> (x + y));
 				put('-', (x, y) -> (x - y));
 				put('*', (x, y) -> (x * y));
+			}
+		};
+
+		@SuppressWarnings("serial")
+		Map<Character, Operator<Integer, Integer, Boolean>> comparators = new HashMap<Character, Operator<Integer, Integer, Boolean>>() {
+			{
+				put('>', (x, y) -> (x > y));
+				put('<', (x, y) -> (x < y));
+				put('≥', (x, y) -> (x >= y));
+				put('≤', (x, y) -> (x <= y));
+				put('=', (x, y) -> (x == y));
 			}
 		};
 	}
