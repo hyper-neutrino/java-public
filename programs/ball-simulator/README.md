@@ -3,11 +3,11 @@
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\\_/^<>↑↓↧.↥+-*`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\_/^←→↑↓↧⇲.↥+-*<>≤≥⋀$`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
-A lowercase letter will result in the interpreter taking an input. If the input is not '0' after being trimmed of whitespace, then a ball is released at that location with an integer value of the input.
+If the character is `⇲`, an input will be taken and stored into a new ball.
 
 An uppercase letter is an output. Every time a ball passes through its space, it will increment its value (by 1). At the end of the execution, all outputs will be printed in order of row first, then column.
 
@@ -32,6 +32,8 @@ Levitation is started only by the character `^` and is stopped by a ramp.
 `+`, `-`, and `*` will consume a ball and store its value on the first ball, and then on the second ball, will consume it and apply that operator to both of them. A new ball with this value is released right under it. It will then reset its memory and reset its state.
 
 `<`, `>`, `≤`, `≥`, and `=` will compare the values of two balls (first in first), and then will release a ball if the comparison is true.
+
+Upon exiting, each space with `$` will report how many times a ball passed over it, starting at (0, 0) and working by rows.
 
 Balls cannot collide. Execution stops once all balls have left the specified grid.
 

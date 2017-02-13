@@ -54,7 +54,7 @@ public class Simulator {
 				delay = Long.parseLong(args[++i]);
 			}
 		}
-		List<String> layers = new ArrayList<>();
+		final List<String> layers = new ArrayList<>();
 		String layer;
 		while (true) {
 			layer = reader.readLine();
@@ -74,10 +74,21 @@ public class Simulator {
 			length = length > l ? length : l;
 		}
 		Simulator.length = length;
-		int[][] hidden_layers = new int[layers.size()][];
-		int[][] metadata = new int[layers.size()][length];
-		int[][] mem = new int[layers.size()][length];
-		boolean[][] mf = new boolean[layers.size()][length];
+		final int[][] hidden_layers = new int[layers.size()][];
+		final int[][] metadata = new int[layers.size()][length];
+		final int[][] mem = new int[layers.size()][length];
+		final boolean[][] mf = new boolean[layers.size()][length];
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			for (int i = 0; i < Simulator.layers; i++) {
+				for (int j = 0; j < Simulator.length; j++) {
+					if (layers.get(i).charAt(j) == '$') {
+						System.out.println(hidden_layers[i][j]);
+					}
+				}
+			}
+		}));
+
 		for (int i = 0; i < layers.size(); i++) {
 			StringBuffer string = new StringBuffer(length);
 			string.append(layers.get(i));
@@ -159,7 +170,7 @@ public class Simulator {
 							createBall(ball.getLayer(), ball.getColumn() - 1, ball.getValue());
 							createBall(ball.getLayer(), ball.getColumn() + 1, ball.getValue());
 						} else {
-							if (space >= 'A' && space <= 'Z') {
+							if (space >= 'A' && space <= 'Z' || space == '$') {
 								hidden_layers[ball.getLayer()][ball.getColumn()]++;
 							} else if (space == '↑') {
 								ball.setValue(ball.getValue() + 1);
@@ -222,7 +233,9 @@ public class Simulator {
 			}
 		}
 
-		if (output_states) {
+		if (output_states)
+
+		{
 			for (int i = 0; i < hidden_layers.length; i++) {
 				int[] hidden_layer = hidden_layers[i];
 				for (int j = 0; j < hidden_layer.length; j++) {
