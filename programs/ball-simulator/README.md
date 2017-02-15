@@ -3,7 +3,7 @@
 This program was inspired by PPCG user PhiNotPi's code-golf challenge. It asks 
 to simulate a "gravity-based billiard ball machine". Here are the exact specs:
 
-The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\_/^←→↑↓↧⇓⇩.↥+-*<>≤≥⋀$`. The virtual machine consists of balls, ramps, logic operators, and outputs.
+The program is first read entirely from STDIN, and then it is run row by row. Each character represents its own part of the code, and the program is entirely interpreted. Any character after and including the first occurrence of `'#'` on a line will be ignored. The textual machine consists of lowercase letters, uppercase letters, and the characters `\_/^←→↑↓↧⇓⇩.↥+-*<>≤≥=⋀$%↔⊞⊟⊻◘|&`. The virtual machine consists of balls, ramps, logic operators, and outputs.
 
 The interpreter will first begin by interpreting the first row.
 
@@ -19,7 +19,7 @@ The character `_` is a logic operator. Whenever a ball passes over its space, it
 
 The character `^` sets a ball's direction to `0` and makes it begin levitating.
 
-The characters `<` and `>` "inject" the ball's value into whatever is to its left/right. Essentially, if a ball with value `X` reaches a control operator with metadata `X`, the operator will do nothing. This allows for condition statements, albeit rather confusing. The ball whose value was used is then destroyed.
+The characters `←`, `→`, and `↔` "inject" the ball's value into whatever is to its left/right/left and right. Essentially, if a ball with value `X` reaches a control operator with metadata `X`, the operator will do nothing. This allows for condition statements, albeit rather confusing. The ball whose value was used is then destroyed.
 
 `↑` and `↓` increment/decrement a ball's value.
 
@@ -34,6 +34,18 @@ Levitation is started only by the character `^` and is stopped by a ramp.
 `+`, `-`, and `*` will consume a ball and store its value on the first ball, and then on the second ball, will consume it and apply that operator to both of them. A new ball with this value is released right under it. It will then reset its memory and reset its state.
 
 `<`, `>`, `≤`, `≥`, and `=` will compare the values of two balls (first in first), and then will release a ball if the comparison is true.
+
+`⋀` splits a ball that hits it, creating a ball of equal value to its left with direction -1 and a ball of equal value to its right with direction +1.
+
+`⊻` only lets a ball pass through it every `k` iterations, where `k` is the metadata it holds. This is useful for selectively managing a stream of input. Note that this is still subject to the ball falling through if the ball's value is `k`.
+
+`⊞` lets balls through normally until a ball whose value is at least its metadata and at most its hidden layer hits it. It will then destroy that ball and all subsequent balls. The first ball to fall on it at the very beginning of execution will be set to its hidden layer.
+
+`⊟` destroys all balls until a ball whose value is at least its metadata and at most its hidden layer hits it. It will then destroy that ball and allow all subsequent balls to pass through. The first ball to fall on it at the very beginning of execution will be set to its hidden layer.
+
+`◘` only lets the first ball pass through it during the entirety of execution.
+
+`|` and `&` are boolean operators, where `0` is `false` and anything else is `true`.
 
 Upon exiting, each space with `$` will report how many times a ball passed over it, starting at (0, 0) and working by rows.
 
